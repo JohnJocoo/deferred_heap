@@ -55,26 +55,27 @@ private:
             return;
 
         using bytes_allocator = typename std::allocator_traits<allocator>::
-                rebind_alloc<unsigned char>;
+                template rebind_alloc<unsigned char>;
         using control_allocator = typename std::allocator_traits<allocator>::
-                rebind_alloc<memory_chunk_header>;
+                template rebind_alloc<memory_chunk_header>;
         using original_alloc_allocator =
                 typename std::allocator_traits<allocator>::
-                    rebind_alloc<allocator>;
+                    template rebind_alloc<allocator>;
         const std::size_t allocation_size = header->get_bytes_allocated();
         auto* raw_ptr = reinterpret_cast<unsigned char*>(
                 header->get_raw_memory_start());
         auto* alloc_ptr = reinterpret_cast<allocator*>(
                 header->get_allocator_start());
-        const auto allocator_raw = bytes_allocator{*alloc_ptr};
-        const auto allocator_control = control_allocator{*alloc_ptr};
-        const auto allocator_original_alloc =
-                original_alloc_allocator{*alloc_ptr};
+        auto allocator_raw = bytes_allocator{*alloc_ptr};
+        auto allocator_control = control_allocator{*alloc_ptr};
+        auto allocator_original_alloc = original_alloc_allocator{*alloc_ptr};
 
-        std::allocator_traits<original_alloc_allocator>::destroy<allocator>(
-                allocator_original_alloc, alloc_ptr);
-        std::allocator_traits<control_allocator>::destroy<memory_chunk_header>(
-                allocator_control, header);
+        std::allocator_traits<original_alloc_allocator>::
+                template destroy<allocator>(
+                        allocator_original_alloc, alloc_ptr);
+        std::allocator_traits<control_allocator>::
+                template destroy<memory_chunk_header>(
+                        allocator_control, header);
         std::allocator_traits<bytes_allocator>::deallocate(
                 allocator_raw, raw_ptr, allocation_size);
     }
@@ -85,7 +86,7 @@ private:
         if (num_objects == 0)
             return;
 
-        const auto& original_alloc = (*reinterpret_cast<allocator*>(
+        auto& original_alloc = (*reinterpret_cast<allocator*>(
                 header.get_allocator_start()));
 
         auto* offset_ptr = reinterpret_cast<type*>(header.get_object_start());
@@ -93,8 +94,8 @@ private:
         for (memory_chunk_header::size_t i = 0;
                 i != num_objects; ++i, --offset_ptr)
         {
-            std::allocator_traits<allocator>::destroy<type>(
-                    original_alloc, offset_ptr);
+            std::allocator_traits<allocator>::
+                    template destroy<type>(original_alloc, offset_ptr);
         }
     }
 

@@ -2,9 +2,13 @@
 
 #include <cstddef>
 #include <cassert>
+#include <functional>
+
 
 namespace def
 {
+
+class simple_allocator;
 
 /**
  * @brief deferred_ptr is a smart pointer used with deferred heap.
@@ -106,6 +110,8 @@ private:
     { }
 
 private:
+    friend class simple_allocator;
+
     pointer m_ptr;
 
 }; // class deferred_ptr<T>

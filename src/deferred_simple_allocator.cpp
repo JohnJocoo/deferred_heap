@@ -8,7 +8,9 @@ namespace def::detail
 void deferred_heap_impl_move_memory_to_deferred_heap(
         deferred_heap_impl& heap, memory_chunk_header* header) noexcept(false)
 {
-    heap.receive_chunk(deferred_heap_impl::chunk_unique_ptr{header});
+    auto ptr = deferred_heap_impl::chunk_unique_ptr{
+                    header, deferred_memory_deleter{}};
+    heap.receive_chunk(std::move(ptr));
 }
 
 } // namespace def::detail

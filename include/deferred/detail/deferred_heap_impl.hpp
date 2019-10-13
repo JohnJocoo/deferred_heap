@@ -8,6 +8,7 @@
 
 namespace def::detail
 {
+
 struct deferred_memory_deleter
 {
     void operator()(memory_chunk_header*) const;

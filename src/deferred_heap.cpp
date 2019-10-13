@@ -197,11 +197,11 @@ std::tuple<deferred_heap_impl::chunks_number,
         deferred_heap_impl::bytes_number>
 deferred_heap_impl::swipe_all_non_marked()
 {
-    const auto remove_it = std::remove_if(
+    const auto remove_it = std::partition(
             begin(m_all_chunks), end(m_all_chunks),
             [](const auto& chunk_ptr) -> bool
             {
-                return !chunk_ptr->flags.is_visited();
+                return chunk_ptr->flags.is_visited();
             });
     const auto end_it = end(m_all_chunks);
     const auto chunks_num = std::distance(remove_it, end_it);
@@ -254,6 +254,12 @@ deferred_heap::bytes_number
 deferred_heap::get_total_bytes() const
 {
     return m_pimpl->get_total_bytes();
+}
+
+simple_allocator
+deferred_heap::get_simple_allocator()
+{
+    return simple_allocator{*m_pimpl};
 }
 
 deferred_heap::stats

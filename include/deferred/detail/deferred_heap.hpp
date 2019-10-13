@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "deferred_simple_allocator.hpp"
+
 namespace def::detail
 {
 
@@ -39,13 +41,14 @@ public:
     deferred_heap& operator=(const deferred_heap&) = delete;
     deferred_heap& operator=(deferred_heap&&) = delete;
 
+    simple_allocator get_simple_allocator();
+    stats release_unreachable();
+
     chunks_number get_memory_chunks_number() const;
     chunks_number get_root_memory_chunks_number() const;
     objects_number get_objects_number() const;
     objects_number get_root_objects_number() const;
     bytes_number get_total_bytes() const;
-
-    stats release_unreachable();
 
 private:
     const std::unique_ptr<detail::deferred_heap_impl> m_pimpl;

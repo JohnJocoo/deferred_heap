@@ -31,23 +31,19 @@ private:
     using type = T;
     using tag = Tag;
 
-    struct disabled_t {};
-    struct fallback { disabled_t __deferred_detail_get_member_info(tag); };
-    struct derived : type, fallback { };
-
-    template<typename C, C> struct is_member;
-
     typedef char                      one;
     typedef struct { char array[2]; } two;
 
+    template <typename C, C>
+    struct helper;
+    template <typename C>
+    static one check(helper<void (*)(tag),
+                            &C::__deferred_detail_declare_have_tag>*);
     template<typename C>
-    static one (&f(is_member<disabled_t (fallback::*)(tag&),
-                             &C::__deferred_detail_get_member_info>*));
-    template<typename C>
-    static two (&f(...));
+    static two check(...);
 
 public:
-    static constexpr bool value = sizeof(f<derived>(0)) == sizeof(two);
+    static constexpr bool value = sizeof(check<type>(0)) == sizeof(one);
 
 }; // object_has_tag<T, Tag>
 
@@ -122,17 +118,31 @@ template <typename... Ts>
 struct tags_list
 { }; // tags_list<Ts...>
 
+template <bool has_tag, typename T, unsigned int I, typename... Ts>
+struct object_tags_impl_conditional
+{
+    using type = tags_list<Ts...>;
+
+}; // object_tags_impl_conditional<false, T, I, Ts...>
+
 template <typename T, unsigned int I, typename... Ts>
 struct object_tags_impl
 {
     using tag_type = std::integral_constant<unsigned int, I>;
     static constexpr bool has_tag = object_has_tag<T, tag_type>::value;
 
-    using type = typename std::conditional<has_tag,
-                     typename object_tags_impl<T, I + 1, Ts..., tag_type >::type,
-                     tags_list<Ts...>>::type;
+    using type = typename object_tags_impl_conditional<
+                              has_tag, T, I, Ts...>::type;
 
 }; // object_tags_impl<T, I, Ts...>
+
+template <typename T, unsigned int I, typename... Ts>
+struct object_tags_impl_conditional<true, T, I, Ts...>
+{
+    using tag_type = std::integral_constant<unsigned int, I>;
+    using type = typename object_tags_impl<T, I + 1, Ts..., tag_type >::type;
+
+}; // object_tags_impl_conditional<true, T, I, Ts...>
 
 template <typename T>
 struct object_tags
