@@ -6,6 +6,7 @@
 #include "is_container.hpp"
 #include "is_deferred_ptr.hpp"
 #include "support_visitor.hpp"
+#include "scan_for_parents.hpp"
 
 namespace def::detail
 {
@@ -158,11 +159,36 @@ struct object_traverse_helper
 
     static void apply_visitor_to_all(visitor& v, object_type& object)
     {
+        apply_visitor_parents(v, object);
         apply_visitor_members(v, object);
         call_visit(v, object);
     }
 
 private:
+    template <typename P>
+    static void apply_visitor_parent(visitor& v, object_type& object)
+    {
+        static_assert(!std::is_same_v<T, P>, "logic error - parent class P can "
+                                             "not be same type as "
+                                             "child class T");
+        static_assert(std::is_base_of_v<P, T>, "logic error - class P is not"
+                                               " a base of T class");
+        object_traverse_helper<P>::apply_visitor_to_all(v, object);
+    }
+
+    static void apply_visitor_parents(visitor& v, object_type& object)
+    {
+        using parents = typename parent_classes<object_type>::type;
+        apply_visitor_parents_impl(v, object, parents{});
+    }
+
+    template <typename... Ts>
+    static void apply_visitor_parents_impl(visitor& v, object_type& object,
+                                           types_list<Ts...>)
+    {
+        (... , apply_visitor_parent<Ts>(v, object));
+    }
+
     template <typename Tag>
     static void apply_visitor_member(visitor& v, object_type& object)
     {

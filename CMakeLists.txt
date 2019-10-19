@@ -10,6 +10,9 @@ set(LIB_HEADERS
         "${INCLUDE_DIR}/deferred_ptr"
         "${INCLUDE_DIR}/visitor"
         "${INCLUDE_DIR}/root_ptr"
+        "${INCLUDE_DIR}/defines"
+        "${INCLUDE_DIR}/simple_allocator"
+        "${INCLUDE_DIR}/is_deferred_base_of"
         "${INCLUDE_DIR}/detail/deferred_heap.hpp"
         "${INCLUDE_DIR}/detail/deferred_heap_impl.hpp"
         "${INCLUDE_DIR}/detail/deferred_ptr.hpp"
@@ -26,7 +29,10 @@ set(LIB_HEADERS
         "${INCLUDE_DIR}/detail/identity.hpp"
         "${INCLUDE_DIR}/detail/is_container.hpp"
         "${INCLUDE_DIR}/detail/is_deferred_ptr.hpp"
-        "${INCLUDE_DIR}/detail/support_visitor.hpp")
+        "${INCLUDE_DIR}/detail/support_visitor.hpp"
+        "${INCLUDE_DIR}/detail/static_class_counter.hpp"
+        "${INCLUDE_DIR}/detail/scan_for_parents.hpp"
+        "${INCLUDE_DIR}/detail/is_deferred_base_of.hpp")
 
 set(IMPL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(LIB_SOURCES
