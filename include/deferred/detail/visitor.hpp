@@ -27,7 +27,7 @@ public:
     {
         if (ptr == nullptr)
             return;
-        auto* header = to_header(ptr.get());
+        auto* header = ptr.get_header();
         assert(header != nullptr);
         if (is_visited(header))
             return;
@@ -35,13 +35,6 @@ public:
     }
 
 private:
-    template <typename T>
-    detail::memory_chunk_header* to_header(T* ptr)
-    {
-        return to_header_impl(reinterpret_cast<void*>(ptr));
-    }
-
-    static detail::memory_chunk_header* to_header_impl(void*);
     static bool is_visited(detail::memory_chunk_header*);
 
 private:

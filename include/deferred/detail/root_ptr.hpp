@@ -21,6 +21,8 @@ namespace def
 template <typename T>
 class root_ptr : public detail::root_ptr_base, public deferred_ptr<T>
 {
+    using deferred_ptr<T>::get_header;
+
 public:
     using pointer	   = typename deferred_ptr<T>::pointer;
     using element_type = typename deferred_ptr<T>::element_type;
@@ -43,7 +45,7 @@ public:
     : deferred_ptr<T>{other}
     {
         if (has_ptr())
-            increment_root_references(get());
+            increment_root_references(get_header());
     }
 
     /// Converting constructor from another type.
@@ -52,7 +54,7 @@ public:
     : deferred_ptr<T>{other}
     {
         if (has_ptr())
-            increment_root_references(get());
+            increment_root_references(get_header());
     }
 
     /// Move constructor. Move pointer from other,
@@ -85,7 +87,7 @@ public:
         release();
         deferred_ptr<T>::operator=(other);
         if (has_ptr())
-            increment_root_references(get());
+            increment_root_references(get_header());
         return *this;
     }
 
@@ -96,7 +98,7 @@ public:
         release();
         deferred_ptr<T>::operator=(other);
         if (has_ptr())
-            increment_root_references(get());
+            increment_root_references(get_header());
         return *this;
     }
 
@@ -135,7 +137,7 @@ private:
     void release() noexcept
     {
         if (has_ptr())
-            decrement_root_references(get());
+            decrement_root_references(get_header());
         deferred_ptr<T>::operator=(nullptr);
     }
 

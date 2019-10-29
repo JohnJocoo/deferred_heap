@@ -5,18 +5,16 @@
 namespace def::detail
 {
 
-void root_ptr_base::increment_root_references_impl(void* ptr)
+void root_ptr_base::increment_root_references(memory_chunk_header* ptr)
 {
-    auto chunk_ptr = memory_chunk_header::from_object_start(ptr);
-    if (chunk_ptr)
-        chunk_ptr->flags.increment_root_reference();
+    if (ptr)
+        ptr->flags.increment_root_reference();
 }
 
-void root_ptr_base::decrement_root_references_impl(void* ptr)
+void root_ptr_base::decrement_root_references(memory_chunk_header* ptr)
 {
-    auto chunk_ptr = memory_chunk_header::from_object_start(ptr);
-    if (chunk_ptr)
-        chunk_ptr->flags.decrement_root_reference();
+    if (ptr)
+        ptr->flags.decrement_root_reference();
 }
 
 } // namespace def::detail

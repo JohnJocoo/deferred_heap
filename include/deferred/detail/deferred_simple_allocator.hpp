@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <cassert>
+#include <utility>
 
 #include "deferred_ptr.hpp"
 #include "root_ptr.hpp"
@@ -99,7 +100,7 @@ template <typename T>
 struct simple_allocator_helper
 {
     template <typename Allocator, typename... Args>
-    static T*
+    static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator,
                       Args&&... args)
     {
@@ -121,7 +122,7 @@ struct simple_allocator_helper
             assert(offset_ptr != nullptr);
             raw_pointer = nullptr;
             deferred_heap_impl_move_memory_to_deferred_heap(heap, control_ptr);
-            return offset_ptr;
+            return {control_ptr, offset_ptr};
         }
         catch(...)
         {
@@ -140,7 +141,7 @@ template <typename T>
 struct simple_allocator_helper<T[]>
 {
     template <typename Allocator>
-    static T*
+    static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator,
                       std::size_t n_objects, const std::remove_extent_t<T>& u)
     {
@@ -148,7 +149,7 @@ struct simple_allocator_helper<T[]>
     }
 
     template <typename Allocator>
-    static T*
+    static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator,
                       std::size_t n_objects)
     {
@@ -157,7 +158,7 @@ struct simple_allocator_helper<T[]>
 
 private:
     template <typename Allocator, typename... Args>
-    static T*
+    static std::pair<memory_chunk_header*, T*>
     allocate_deferred_impl(deferred_heap_impl& heap, const Allocator& allocator,
                            std::size_t n_objects, Args&&... args)
     {
@@ -185,7 +186,7 @@ private:
             assert(offset_ptr != nullptr);
             raw_pointer = nullptr;
             deferred_heap_impl_move_memory_to_deferred_heap(heap, control_ptr);
-            return offset_ptr;
+            return {control_ptr, offset_ptr};
         }
         catch(...)
         {
@@ -204,7 +205,7 @@ template <typename T, size_t N>
 struct simple_allocator_helper<T[N]>
 {
     template <typename Allocator>
-    static T*
+    static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator,
                       const std::remove_extent_t<T>& u)
     {
@@ -213,7 +214,7 @@ struct simple_allocator_helper<T[N]>
     }
 
     template <typename Allocator>
-    static T*
+    static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator)
     {
         return simple_allocator_helper<T[]>::allocate_deferred(
@@ -244,10 +245,10 @@ public:
     allocate_deferred(const Allocator& allocator, Args&&... args)
     {
         assert(m_heap);
-        const auto ptr = detail::simple_allocator_helper<T>::
+        const auto [header, ptr] = detail::simple_allocator_helper<T>::
                 template allocate_deferred<Allocator, Args...>(
                         *m_heap, allocator, std::forward<Args>(args)...);
-        return deferred_ptr<T>{ptr};
+        return deferred_ptr<T>{header, ptr};
     }
 
     template <typename T>
@@ -276,15 +277,7 @@ private:
     template <typename P>
     void destroy_deferred_impl(P& def_ptr)
     {
-        using deferred_pointer = P;
-        using base_pointer = typename deferred_pointer::pointer;
-
-        base_pointer ptr = def_ptr.get();
-        if (ptr == nullptr)
-            return;
-
-        detail::memory_chunk_header* header =
-                detail::memory_chunk_header::from_object_start(ptr);
+        detail::memory_chunk_header* header = def_ptr.get_header();
         if (header && !header->flags.is_destroyed())
         {
             header->helper.destroy(*header);

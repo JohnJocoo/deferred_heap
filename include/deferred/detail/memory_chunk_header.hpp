@@ -56,8 +56,6 @@ struct memory_chunk_header
 
     size_t get_bytes_allocated() const noexcept;
 
-    static memory_chunk_header* from_object_start(void*) noexcept;
-
     const type_helper& helper;
     chunk_flags flags;
 

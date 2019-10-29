@@ -144,14 +144,4 @@ memory_chunk_header::get_bytes_allocated() const noexcept
     return res + sizeof(memory_chunk_header) + helper.bytes_per_allocator;
 }
 
-memory_chunk_header*
-memory_chunk_header::from_object_start(void* ptr) noexcept
-{
-    if (ptr == nullptr)
-        return nullptr;
-    auto chunk_ptr = reinterpret_cast<uint8_t*>(ptr)
-            - sizeof(memory_chunk_header);
-    return reinterpret_cast<memory_chunk_header*>(chunk_ptr);
-}
-
 } // namespace def::detail

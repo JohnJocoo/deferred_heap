@@ -8,7 +8,15 @@
 namespace def
 {
 
+namespace detail
+{
+
+struct memory_chunk_header;
+
+} // namespace detail
+
 class simple_allocator;
+class visitor;
 
 /**
  * @brief deferred_ptr is a smart pointer used with deferred heap.
@@ -31,11 +39,13 @@ public:
     /// Default constructor, creates an empty deferred_ptr.
     constexpr deferred_ptr() noexcept
     : m_ptr{nullptr}
+    , m_header{nullptr}
     { }
 
     /// Creates an empty deferred_ptr.
     constexpr deferred_ptr(nullptr_t) noexcept
     : m_ptr{nullptr}
+    , m_header{nullptr}
     { }
 
     /// Copy constructor. Do simple copy as deferred_ptr doesn't own an object.
@@ -45,12 +55,14 @@ public:
     template<typename Up>
     deferred_ptr(const deferred_ptr<Up>& other) noexcept
     : m_ptr{other.m_ptr}
+    , m_header{other.m_header}
     { }
 
     /// Destructor, do nothing as deferred_ptr doesn't own an object.
     ~deferred_ptr() noexcept
     {
         m_ptr = nullptr;
+        m_header = nullptr;
     }
 
     // Assignment.
@@ -64,6 +76,7 @@ public:
     deferred_ptr& operator=(const deferred_ptr<Up>& other) noexcept
     {
         m_ptr = other.m_ptr;
+        m_header = other.m_header;
         return *this;
     }
 
@@ -71,6 +84,7 @@ public:
     deferred_ptr& operator=(nullptr_t) noexcept
     {
         m_ptr = nullptr;
+        m_header = nullptr;
         return *this;
     }
 
@@ -100,19 +114,34 @@ public:
     /// Return true if the stored pointer is not null.
     explicit operator bool() const noexcept
     {
-        return m_ptr != nullptr;
+        return m_ptr != nullptr && m_header != nullptr;
+    }
+
+protected:
+    detail::memory_chunk_header* get_header() const noexcept
+    {
+        return m_header;
     }
 
 private:
     /// Constructor to be used only by deferred allocator.
-    explicit deferred_ptr(pointer ptr) noexcept
+    explicit deferred_ptr(detail::memory_chunk_header* header,
+                          pointer ptr) noexcept
     : m_ptr{ptr}
-    { }
+    , m_header{header}
+    {
+        // both nullptr, or both have value
+        assert((m_ptr == nullptr) == (m_header == nullptr));
+    }
 
 private:
+    template <typename U>
+    friend class deferred_ptr;
     friend class simple_allocator;
+    friend class visitor;
 
-    pointer m_ptr;
+    pointer                         m_ptr;
+    detail::memory_chunk_header*    m_header;
 
 }; // class deferred_ptr<T>
 
