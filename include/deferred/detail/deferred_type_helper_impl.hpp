@@ -35,16 +35,21 @@ private:
         {
             object_traverse_helper<T>::apply_visitor_to_all(v, *ptr);
         }
-        for (auto* chunk: non_visited_chunks)
+        for (auto*& chunk: non_visited_chunks)
         {
             assert(chunk != nullptr);
-            assert(!chunk->flags.is_visited());
+            if (chunk->flags.is_visited())
+            {
+                chunk = nullptr;
+                continue;
+            }
             chunk->flags.mark_visited();
             assert(chunk->flags.is_visited());
         }
         for (auto* chunk: non_visited_chunks)
         {
-            assert(chunk != nullptr);
+            if (chunk == nullptr)
+                continue;
             chunk->helper.mark_recursive(*chunk);
         }
     }
