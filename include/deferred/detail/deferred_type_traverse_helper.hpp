@@ -88,7 +88,7 @@ struct apply_visitor_object_impl
     template <typename T>
     static void call_visit(visitor& v, T& object)
     {
-        object.visit(v);
+        v.call_visit(object);
     }
 
 }; // apply_visitor_object_impl<true>

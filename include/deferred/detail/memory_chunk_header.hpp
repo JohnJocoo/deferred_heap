@@ -8,10 +8,11 @@ namespace def::detail
 
 class type_helper;
 
-/// Util memory header for deferred heap to control deferred memory chunks.
+/// Util memory header for deferred heap to control memory chunks.
 /// Any memory chunk allocated with deferred allocator
-/// is allocated with bigger size to incorporate this header
-/// and also number of objects in case of array allocation.
+/// is allocated with bigger size to incorporate this header,
+/// copy of allocator and also number of objects
+/// in case of array allocation.
 struct memory_chunk_header
 {
     using size_t = std::size_t;
