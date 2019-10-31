@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <iterator>
 
 #include "visitor.hpp"
 #include "is_container.hpp"
@@ -15,10 +16,14 @@ template <typename T>
 struct is_container_of_deferred_ptr
 {
 private:
-    struct dummy { typedef void value_type; };
+    struct dummy
+    {
+        dummy* begin() const;
+    };
     using t_type = std::conditional_t<
             is_container<T>::value, T, dummy>;
-    using container_type = typename t_type::value_type;
+    using container_type = typename std::decay_t<
+            decltype(*std::cbegin(*((t_type*)nullptr)))>;
 
 public:
     static constexpr bool value = is_deferred_ptr<container_type>::value;

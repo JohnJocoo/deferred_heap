@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.7)
 
 project(DeferredHeap LANGUAGES CXX VERSION 0.1.0)
 
+option(DEFERRED_HEAP_BUILD_TEST "Build tests for DeferredHeap" OFF)
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/deferred")
@@ -48,5 +50,7 @@ add_library(DeferredHeap
 target_include_directories(DeferredHeap PUBLIC
                            "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-add_executable(main main.cpp)
-target_link_libraries(main DeferredHeap)
+if (DEFERRED_HEAP_BUILD_TEST)
+    add_subdirectory(test)
+endif(DEFERRED_HEAP_BUILD_TEST)
+unset(DEFERRED_HEAP_BUILD_TEST CACHE)

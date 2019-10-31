@@ -71,4 +71,11 @@ struct is_container<std::basic_string<_CharT, _Traits, _Alloc>>
 
 }; // struct is_container<std::basic_string>
 
+template<typename T, std::size_t N>
+struct is_container<T[N]>
+{
+    static constexpr bool value = true;
+
+}; // struct is_container<T[N]>
+
 } // namespace def::detail
