@@ -8,10 +8,25 @@
 namespace def::detail
 {
 
+template <bool is_class, typename T>
+struct has_visit_method_impl
+{
+    static constexpr bool value = visitor::has_visit_method<T>();
+
+}; // struct has_visit_method_impl<true, T>
+
+template <typename T>
+struct has_visit_method_impl<false, T>
+{
+    static constexpr bool value = false;
+
+}; // struct has_visit_method_impl<false, T>
+
 template <typename T>
 struct has_visit_method
 {
-    static constexpr bool value = visitor::has_visit_method<T>();
+    static constexpr bool value = has_visit_method_impl<
+            std::is_class_v<T>, T>::value;
 
 }; // struct has_visit_method<T>
 

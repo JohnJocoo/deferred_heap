@@ -34,7 +34,10 @@ public:
     : m_i{i}
     , m_end{end}
     , m_filter{f}
-    {}
+    {
+        while (m_i != m_end && !m_filter(*m_i))
+            ++m_i;
+    }
 
     filtering_iterator& operator++()
     {

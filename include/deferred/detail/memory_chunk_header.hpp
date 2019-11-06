@@ -45,7 +45,7 @@ struct memory_chunk_header
     }; // class chunk_flags
 
     explicit memory_chunk_header(const type_helper& helper,
-                                 bool is_array)
+                                 bool is_array) noexcept
     : helper{helper}
     , flags{is_array}
     { }

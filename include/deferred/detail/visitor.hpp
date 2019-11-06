@@ -13,8 +13,8 @@ namespace detail
 
 struct memory_chunk_header;
 
-template <typename T>
-struct has_visit_method;
+template <bool is_class, typename T>
+struct has_visit_method_impl;
 
 template <bool>
 struct apply_visitor_object_impl;
@@ -104,8 +104,8 @@ private:
         object.visit(*this);
     }
 
-    template <typename T>
-    friend struct detail::has_visit_method;
+    template <bool is_class, typename T>
+    friend struct detail::has_visit_method_impl;
 
     template <typename T>
     friend struct support_visitor;

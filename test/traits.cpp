@@ -181,6 +181,7 @@ struct wrong_visitor_noarg
 
 }
 
+
 TEST(is_deferred_base_of, simple_struct)
 {
     const auto child_struct_one_val =

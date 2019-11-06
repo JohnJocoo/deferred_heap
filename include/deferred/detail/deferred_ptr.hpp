@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cassert>
 #include <functional>
+#include <type_traits>
 
 
 namespace def
@@ -30,8 +31,8 @@ template <typename T>
 class deferred_ptr
 {
 public:
-    using pointer	   = T*;
-    using element_type = T;
+    using element_type = std::remove_extent_t<T>;
+    using pointer      = element_type*;
 
 public:
     // Constructors.
@@ -91,18 +92,25 @@ public:
     // Observers.
 
     /// Dereference the stored pointer.
-    typename std::add_lvalue_reference<element_type>::type
+    typename std::add_lvalue_reference<T>::type
     operator*() const noexcept
     {
         assert(m_ptr);
-        return *m_ptr;
+        return *((T*)m_ptr);
     }
 
     /// Return the stored pointer.
-    pointer operator->() const noexcept
+    T* operator->() const noexcept
     {
         assert(m_ptr);
         return m_ptr;
+    }
+
+    template <typename C = T>
+    std::enable_if_t<std::is_array_v<C>, element_type&>
+    operator[](std::ptrdiff_t idx) const
+    {
+        return m_ptr[idx];
     }
 
     /// Return the stored pointer.

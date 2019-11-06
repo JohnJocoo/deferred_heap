@@ -44,12 +44,13 @@ set(TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(TEST_HEADERS "")
 
 set(TEST_SOURCES
-        "${TEST_DIR}/traits.cpp")
+        "${TEST_DIR}/traits.cpp"
+        "${TEST_DIR}/simple_allocator.cpp")
 
 add_executable(DeferredHeapTest
                ${TEST_HEADERS} ${TEST_SOURCES})
 target_link_libraries(DeferredHeapTest
-                      DeferredHeap gtest_main)
+                      DeferredHeap gmock gtest_main)
                       
 add_test(TestDeferredHeap DeferredHeapTest)
 

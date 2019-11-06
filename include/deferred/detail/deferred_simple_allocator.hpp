@@ -140,15 +140,15 @@ struct simple_allocator_helper
 template <typename T>
 struct simple_allocator_helper<T[]>
 {
-    template <typename Allocator>
+    template <typename Allocator, typename... Args>
     static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator,
-                      std::size_t n_objects, const std::remove_extent_t<T>& u)
+                      std::size_t n_objects, const T& u)
     {
         return allocate_deferred_impl(heap, allocator, n_objects, u);
     }
 
-    template <typename Allocator>
+    template <typename Allocator, typename... Args>
     static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator,
                       std::size_t n_objects)
@@ -164,13 +164,13 @@ private:
     {
         using bytes_allocator = typename std::allocator_traits<Allocator>::
                 template rebind_alloc<unsigned char>;
-        constexpr std::size_t allocation_size =
+        const std::size_t allocation_size =
                 sizeof(T) * n_objects +
                 sizeof(memory_chunk_header) +
                 sizeof(memory_chunk_header::size_t) +
                 sizeof(Allocator);
 
-        const auto allocator_raw = bytes_allocator{allocator};
+        auto allocator_raw = bytes_allocator{allocator};
         auto* raw_pointer = std::allocator_traits<bytes_allocator>::allocate(
                 allocator_raw, allocation_size);
         assert(raw_pointer != nullptr);
@@ -204,16 +204,16 @@ private:
 template <typename T, size_t N>
 struct simple_allocator_helper<T[N]>
 {
-    template <typename Allocator>
+    template <typename Allocator, typename... Args>
     static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator,
-                      const std::remove_extent_t<T>& u)
+                      const T& u)
     {
         return simple_allocator_helper<T[]>::allocate_deferred(
                 heap, allocator, N, u);
     }
 
-    template <typename Allocator>
+    template <typename Allocator, typename... Args>
     static std::pair<memory_chunk_header*, T*>
     allocate_deferred(deferred_heap_impl& heap, const Allocator& allocator)
     {
@@ -236,8 +236,9 @@ public:
     template <typename T, typename... Args>
     deferred_ptr<T> make_deferred(Args&&... args)
     {
-        return allocate_deferred<T, std::allocator<T>, Args...>(
-                std::allocator<T>{}, std::forward<Args>(args)...);
+        using clean_t = std::remove_extent_t<T>;
+        return allocate_deferred<T, std::allocator<clean_t>, Args...>(
+                std::allocator<clean_t>{}, std::forward<Args>(args)...);
     }
 
     template <typename T, typename Allocator, typename... Args>
