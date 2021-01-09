@@ -10,7 +10,7 @@ namespace def
 bool visitor::is_visited(detail::memory_chunk_header* ptr)
 {
     assert(ptr != nullptr);
-    ptr->flags.is_visited();
+    return ptr->flags.is_visited();
 }
 
 } // namespace def

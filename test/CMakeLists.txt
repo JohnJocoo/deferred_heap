@@ -45,6 +45,7 @@ set(TEST_HEADERS "")
 
 set(TEST_SOURCES
         "${TEST_DIR}/traits.cpp"
+        "${TEST_DIR}/deferred_heap.cpp"
         "${TEST_DIR}/simple_allocator.cpp")
 
 add_executable(DeferredHeapTest

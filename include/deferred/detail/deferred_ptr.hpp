@@ -33,6 +33,7 @@ class deferred_ptr
 public:
     using element_type = std::remove_extent_t<T>;
     using pointer      = element_type*;
+    using nullptr_t    = std::nullptr_t;
 
 public:
     // Constructors.
@@ -161,7 +162,7 @@ inline bool operator==(const deferred_ptr<T1>& ptr_left,
 }
 
 template <typename T>
-inline bool operator==(nullptr_t,
+inline bool operator==(std::nullptr_t,
                        const deferred_ptr<T>& ptr)
 {
     return !ptr;
@@ -169,7 +170,7 @@ inline bool operator==(nullptr_t,
 
 template <typename T>
 inline bool operator==(const deferred_ptr<T>& ptr,
-                       nullptr_t)
+                       std::nullptr_t)
 {
     return !ptr;
 }
@@ -182,7 +183,7 @@ inline bool operator!=(const deferred_ptr<T1>& ptr_left,
 }
 
 template <typename T>
-inline bool operator!=(nullptr_t,
+inline bool operator!=(std::nullptr_t,
                        const deferred_ptr<T>& ptr)
 {
     return static_cast<bool>(ptr);
@@ -190,7 +191,7 @@ inline bool operator!=(nullptr_t,
 
 template <typename T>
 inline bool operator!=(const deferred_ptr<T>& ptr,
-                       nullptr_t)
+                       std::nullptr_t)
 {
     return static_cast<bool>(ptr);
 }
@@ -206,7 +207,7 @@ inline bool operator<(const deferred_ptr<T1>& ptr_left,
 }
 
 template <typename T>
-inline bool operator<(nullptr_t,
+inline bool operator<(std::nullptr_t,
                       const deferred_ptr<T>& ptr)
 {
     return std::less<typename deferred_ptr<T>::pointer>()(nullptr,
@@ -215,7 +216,7 @@ inline bool operator<(nullptr_t,
 
 template <typename T>
 inline bool operator<(const deferred_ptr<T>& ptr,
-                      nullptr_t)
+                      std::nullptr_t)
 {
     return std::less<typename deferred_ptr<T>::pointer>()(ptr.get(),
                                                           nullptr);
@@ -229,7 +230,7 @@ inline bool operator<=(const deferred_ptr<T1>& ptr_left,
 }
 
 template <typename T>
-inline bool operator<=(nullptr_t,
+inline bool operator<=(std::nullptr_t,
                        const deferred_ptr<T>& ptr)
 {
     return !(ptr < nullptr);
@@ -237,7 +238,7 @@ inline bool operator<=(nullptr_t,
 
 template <typename T>
 inline bool operator<=(const deferred_ptr<T>& ptr,
-                       nullptr_t)
+                       std::nullptr_t)
 {
     return !(nullptr < ptr);
 }
@@ -250,7 +251,7 @@ inline bool operator>(const deferred_ptr<T1>& ptr_left,
 }
 
 template <typename T>
-inline bool operator>(nullptr_t,
+inline bool operator>(std::nullptr_t,
                       const deferred_ptr<T>& ptr)
 {
     return ptr < nullptr;
@@ -258,7 +259,7 @@ inline bool operator>(nullptr_t,
 
 template <typename T>
 inline bool operator>(const deferred_ptr<T>& ptr,
-                      nullptr_t)
+                      std::nullptr_t)
 {
     return nullptr < ptr;
 }
@@ -271,7 +272,7 @@ inline bool operator>=(const deferred_ptr<T1>& ptr_left,
 }
 
 template <typename T>
-inline bool operator>=(nullptr_t,
+inline bool operator>=(std::nullptr_t,
                        const deferred_ptr<T>& ptr)
 {
     return !(nullptr < ptr);
@@ -279,7 +280,7 @@ inline bool operator>=(nullptr_t,
 
 template <typename T>
 inline bool operator>=(const deferred_ptr<T>& ptr,
-                       nullptr_t)
+                       std::nullptr_t)
 {
     return !(ptr < nullptr);
 }

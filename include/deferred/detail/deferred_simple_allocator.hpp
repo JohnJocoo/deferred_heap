@@ -91,6 +91,7 @@ private:
         {
             std::allocator_traits<control_allocator>::
                     destroy(allocator_control, control_ptr);
+            throw;
         }
     }
 

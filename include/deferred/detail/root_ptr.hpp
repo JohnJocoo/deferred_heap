@@ -26,6 +26,7 @@ class root_ptr : public detail::root_ptr_base, public deferred_ptr<T>
 public:
     using pointer	   = typename deferred_ptr<T>::pointer;
     using element_type = typename deferred_ptr<T>::element_type;
+    using nullptr_t    = std::nullptr_t;
 
     using deferred_ptr<T>::get;
 
